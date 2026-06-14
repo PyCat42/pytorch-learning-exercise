@@ -30,7 +30,10 @@ def plot_predictions(train_data, train_labels,
     plt.scatter(test_data, predictions, c="red", s=4, label="Predictions")
 
   plt.legend()
-  plt.savefig(filename)
+
+  if filename is not None:
+    plt.savefig(filename)
+
   plt.show()
 
 def plot_curves(epoch_values, train_values, test_values, var_to_plot, filename=f"curves.png"):
@@ -56,7 +59,9 @@ def plot_curves(epoch_values, train_values, test_values, var_to_plot, filename=f
   plt.ylabel(var_to_plot.capitalize())
   plt.legend()
 
-  plt.savefig(filename)
+  if filename is not None:
+    plt.savefig(filename)
+
   plt.show()
 
 def plot_decision_boundary(model, X, y, cmap="cool"):
@@ -93,3 +98,27 @@ def plot_decision_boundary(model, X, y, cmap="cool"):
   plt.scatter(X[:, 0], X[:, 1], c=y, s=4, cmap=cmap)
   plt.xlim(x_min, x_max)
   plt.ylim(y_min, y_max)
+
+def plot_test_train_decision_boundary(model, X_train, y_train, X_test, y_test, filename=None):
+  """
+  Plots the decision boundary fitted by model for binary or multiclass classification
+  for train and test data side by side.
+  :param model: fitted model
+  :param X: data
+  :param y: labels
+  :return:
+  """
+  plt.figure(figsize=(12, 6))
+
+  plt.subplot(1, 2, 1)
+  plt.title("Train")
+  plot_decision_boundary(model, X_train, y_train)
+
+  plt.subplot(1, 2, 2)
+  plt.title("Test")
+  plot_decision_boundary(model, X_test, y_test)
+
+  if filename is not None:
+    plt.savefig(filename)
+
+  plt.show()
