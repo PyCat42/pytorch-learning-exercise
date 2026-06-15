@@ -1,4 +1,12 @@
 import torch
+import torchvision
+
+import matplotlib.pyplot as plt
+
+from tqdm.auto import tqdm
+
+from pathlib import Path
+from typing import List
 
 def train_test_split(X_data, y_data, train_size=0.8):
     """
@@ -33,7 +41,7 @@ def train_step(model: torch.nn.Module,
                optimizer: torch.optim.Optimizer,
                accuracy_func,
                device: torch.device = "cpu",
-               print_status: bool = True):
+               print_status: bool = False):
     """
     Functionalizing training loop.
     :param model: model to train
@@ -42,7 +50,8 @@ def train_step(model: torch.nn.Module,
     :param optimizer: optimizer
     :param accuracy_func: accuracy function
     :param device: "cpu" or "gpu
-    :param print_status: if True (default) printing loss and accuracy values during training
+    :param print_status: if True printing loss and accuracy values during training;
+    default is False
     :return:
     """
     # Initialize loss and accuracy to 0
@@ -84,12 +93,14 @@ def train_step(model: torch.nn.Module,
         # Print progress
         print(f"Train loss: {train_loss:.5f} | Train accuracy: {train_acc:.2f}")
 
+    return train_loss, train_acc
+
 def test_step(model: torch.nn.Module,
               data_loader: torch.utils.data.DataLoader,
               loss_func: torch.nn.Module,
               accuracy_func,
               device: torch.device = "cpu",
-              print_status: bool = True):
+              print_status: bool = False):
     """
     Functionalizing testing loop.
     :param model: model to train
@@ -98,7 +109,8 @@ def test_step(model: torch.nn.Module,
     :param optimizer: optimizer
     :param accuracy_func: accuracy function
     :param device: "cpu" or "gpu
-    :param print_status: if True (default) printing loss and accuracy values during training
+    :param print_status: if True printing loss and accuracy values during training;
+    default is False
     :return:
     """
     # Initialize loss and accuracy to 0
@@ -125,6 +137,70 @@ def test_step(model: torch.nn.Module,
     if print_status:
         # Print progress
         print(f"Test loss: {test_loss:.5f} | Test accuracy: {test_acc:.2f}")
+
+    return test_loss, test_acc
+
+def train(model: torch.nn.Module,
+          train_dataloader: torch.utils.data.DataLoader,
+          test_dataloader: torch.utils.data.DataLoader,
+          optimizer: torch.optim.Optimizer,
+          accuracy_func,
+          loss_func: torch.nn.Module = torch.nn.CrossEntropyLoss(),
+          epochs: int = 5,
+          device = "cpu"):
+    """
+    A single function that combines training and testing loop.
+    :param model: model to be trained
+    :param train_dataloader: dataloader with training data
+    :param test_dataloader: dataloader with testing data
+    :param optimizer: optimizer
+    :param accuracy_func: accuracy function
+    :param loss_func: loss function
+    :param epochs: number of epochs
+    :param device: "cpu" or "cuda"
+    :return:
+    """
+    # Initialize results dictionary
+    results = {
+        "train_loss": [],
+        "train_acc": [],
+        "test_loss": [],
+        "test_acc": []
+    }
+
+    # Loop over epochs
+    for epoch in tqdm(range(epochs)):
+        print(f"\nEpoch: {epoch}\n--------------------------")
+
+        # Train
+        train_loss, train_acc = train_step(
+            model=model,
+            data_loader=train_dataloader,
+            loss_func=loss_func,
+            optimizer=optimizer,
+            accuracy_func=accuracy_func,
+            device=device
+        )
+
+        # Test
+        test_loss, test_acc = test_step(
+            model=model,
+            data_loader=test_dataloader,
+            loss_func=loss_func,
+            accuracy_func=accuracy_func,
+            device=device
+        )
+
+        print(f"Train loss: {train_loss:.4f} | Train accuracy: {train_acc:.4f}")
+        print(f"Test loss: {test_loss:.4f} | Test accuracy: {test_acc:.4f}")
+
+        # Add epoch results to dictionary
+        results["train_loss"].append(train_loss)
+        results["train_acc"].append(train_acc)
+        results["test_loss"].append(test_loss)
+        results["test_acc"].append(test_acc)
+
+    return results
 
 def get_training_time(start_time: float, end_time: float, device: torch.device ="cpu"):
     """
@@ -214,3 +290,63 @@ def make_predictions(model: torch.nn.Module,
 
     # Stack list to return a prediction tensor
     return torch.stack(pred_probs)
+
+def pred_and_plot(model: torch.nn.Module,
+                  image_path: Path,
+                  class_names: List[str] = None,
+                  transform=None,
+                  device: torch.device = "cpu",
+                  filename: str = None):
+    """
+    Take an image path, transform it to match model input,
+    make prediction based on a trained model
+    and plot transformed image with prediction as plot title.
+    :param model: trained model
+    :param image_path: path to custom image
+    :param class_names: possible class names
+    :param transform: transforms that need to be applied to image
+    so its format matches data on which model was trained
+    :param device: "cpu" or "cuda"
+    :param filename: name of the file to save created image to (not saved unless specified)
+    :return:
+    """
+    # Read image and convert it to PyTorch default data type float32
+    target_image = torchvision.io.read_image(str(image_path)).type(torch.float32)
+
+    # Image is represented with values 0-255 but we want 0-1
+    target_image /= 255
+
+    # Apply transformations if needed
+    if transform:
+        target_image = transform(target_image)
+
+    # Put model to device
+    model.to(device)
+
+    # Put model in evaluation mode
+    model.eval()
+    with torch.inference_mode():
+        # Model expects batch size as dim 0
+        target_image = target_image.unsqueeze(dim=0)
+
+        # Make prediction
+        target_image_pred = model(target_image.to(device))
+
+        # Turn prediction into class probabilities and label
+        target_image_pred_prob = torch.softmax(target_image_pred, dim=1)
+        target_image_pred_label = torch.argmax(target_image_pred_prob)
+
+    plt.imshow(target_image.squeeze().permute(1, 2, 0))
+    if class_names:
+        title = (f"Pred: {class_names[target_image_pred_label.cpu()]}"
+                 f"\nProb: {target_image_pred_prob.max().cpu():.3f}")
+    else:
+        title = (f"Pred: {target_image_pred_label.cpu()}"
+                 f"\nProb: {target_image_pred_prob.max().cpu():.3f}")
+    plt.title(title)
+    plt.axis(False)
+
+    if filename:
+        plt.savefig(filename)
+
+    plt.show()
