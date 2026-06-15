@@ -1,6 +1,38 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import random
+from PIL import Image
 import torch
+from torchvision import transforms
+from pathlib import Path
+
+
+def plot_transformed_images(image_paths: list[Path], transform: transforms.Transform,
+                            n: int =3, seed: int =None):
+  """
+  Visualize randomly chosen original images next to their transformed ones.
+  :param image_paths: image path list
+  :param transform: transformation to apply to the original image
+  :param n: number of examples to show
+  :param seed: random seed
+  :return:
+  """
+  if seed:
+    random.seed(seed)
+  random_image_paths = random.sample(image_paths, k=n)
+  for image_path in random_image_paths:
+    with Image.open(image_path) as f:
+      fig, ax = plt.subplots(nrows=1, ncols=2)
+      ax[0].imshow(f)
+      ax[0].set_title(f"Original\nSize: {f.size}")
+      ax[0].axis(False)
+
+      transformed_image = transform(f).permute(1, 2, 0)
+      ax[1].imshow(transformed_image)
+      ax[1].set_title(f"Transformed\nSize: {transformed_image.shape}")
+      ax[1].axis(False)
+
+      fig.suptitle(f"Class: {image_path.parent.stem}", fontsize=16)
 
 def plot_predictions(train_data, train_labels,
                      test_data, test_labels,
