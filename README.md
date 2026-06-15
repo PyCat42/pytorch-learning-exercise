@@ -1,4 +1,4 @@
-# PyTorch Learning Exercice
+# PyTorch Learning Exercise
 
 This repo contains some basic PyTorch exercises
 on building, training and making predictions using basic linear regression and classification models.
@@ -96,9 +96,9 @@ Small amount of data turns out to be quite limiting since a CNN based model is u
 While observed trend for accuracy and loss is generally in the right direction 
 model should be trained on larger dataset and fine-tuned.
 
-| Original image                                | Model prediction                                           |
-|-----------------------------------------------|------------------------------------------------------------|
-|<img src="tests/food_classification/data/pizza_img.jpeg" width="300" /> | ![](tests/food_classification/example_custom_prediction.png) |
+| Original image                                                          | Model prediction                                             |
+|-------------------------------------------------------------------------|--------------------------------------------------------------|
+| <img src="tests/food_classification/data/pizza_img.jpeg" width="300" /> | ![](tests/food_classification/example_custom_prediction.png) |
 
 - testing code: [food_classification](tests/food_classification)
 
