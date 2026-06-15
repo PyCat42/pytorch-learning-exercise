@@ -6,7 +6,8 @@ on building, training and making predictions using basic linear regression and c
 It follows this original tutorial by Daniel Bourke:
 https://www.youtube.com/watch?v=Z_ikDlimN6A&t=2s
 
-## In this repo
+## What's in This Repo
+
 [src](src):
 - [model.py](src/models.py) - Contains custom model classes.
 - [ml_helpers.py](src/ml_helpers.py) - Various train, test and prediction helper functions.
@@ -21,8 +22,8 @@ https://www.youtube.com/watch?v=Z_ikDlimN6A&t=2s
 This baseline model for linear regression is implemented in class SimpleLinearRegressionModel.
 Model is tested on dummy data.
 
-| Linear Regression Model - No Predictions                   | Linear Regression Model - Predictions                   |
-|------------------------------------------------------------|---------------------------------------------------------|
+| Linear Regression Model - No Predictions                  | Linear Regression Model - Predictions                  |
+|-----------------------------------------------------------|--------------------------------------------------------|
 | ![](tests/simple_lin_reg_model/lin_reg_model_no_pred.png) | ![](tests/simple_lin_reg_model/lin_reg_model_pred.png) |
 
 - testing code: [simple_lin_reg_model](tests/simple_lin_reg_model)
@@ -62,6 +63,13 @@ Simple linear model's results in terms of accuracy and loss are comparable to CN
 Nonlinear model doesn't seem to bring any benefits.
 
 ![Example CNN Model Prediction](tests/fashionMNIST_classification/example_prediction.png)
+
+Valuable insights are also provided by confusion matrices.
+
+| Linear Model                                               | Non-linear Model                                               | CNN                                                      |
+|------------------------------------------------------------|----------------------------------------------------------------|----------------------------------------------------------|
+|![](tests/fashionMNIST_classification/linear_confusion.png) | ![](tests/fashionMNIST_classification/nonlinear_confusion.png) | ![](tests/fashionMNIST_classification/CNN_confusion.png) |
+
 
 - testing code: [fashionMNIST_classification](tests/fashionMNIST_classification)
 
