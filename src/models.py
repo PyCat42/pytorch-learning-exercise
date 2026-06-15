@@ -68,7 +68,7 @@ class CircleMultiClassModel_NonLinear(nn.Module):
     def forward(self, x):
         return self.linear_layer_stack(x)
 
-class FashionMNISTModelV0(nn.Module):
+class ImageClassLinear(nn.Module):
     """
     Baseline model for FashionMNIST dataset classification
     """
@@ -85,7 +85,7 @@ class FashionMNISTModelV0(nn.Module):
     def forward(self, x):
         return self.layer_stack(x)
 
-class FashionMNISTModelV1(nn.Module):
+class ImageClassNonlinear(nn.Module):
     """
     FashionMNIST dataset classification model with nonlinearities.
     """
@@ -104,11 +104,12 @@ class FashionMNISTModelV1(nn.Module):
     def forward(self, x: torch.Tensor):
         return self.layer_stack(x)
 
-class FashionMNISTModelV2(nn.Module):
+class ImageClassCNN(nn.Module):
     """
     CNN FashionMNIST dataset classification model based on TinyVGG architecture.
     """
-    def __init__(self, input_shape: int, hidden_units: int, output_shape: int):
+    def __init__(self, input_shape: int, hidden_units: int, output_shape: int,
+                 img_height: int, img_width: int):
         super().__init__()
         self.conv_block_1 = nn.Sequential(
             nn.Conv2d(in_channels=input_shape,
@@ -142,9 +143,15 @@ class FashionMNISTModelV2(nn.Module):
             nn.MaxPool2d(kernel_size=2)
         )
 
+        # Get size of flattened tensor after passing conv blocks 1 and 2
+        with torch.inference_mode():
+            dummy = torch.zeros(1, input_shape, img_height, img_width)
+            dummy = self.conv_block_2(self.conv_block_1(dummy))
+            flatten_size = dummy.numel()
+
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=hidden_units*7*7,
+            nn.Linear(in_features=flatten_size,
                       out_features=output_shape)
         )
 
