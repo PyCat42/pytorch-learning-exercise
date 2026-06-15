@@ -8,11 +8,11 @@ https://www.youtube.com/watch?v=Z_ikDlimN6A&t=2s
 
 ## In this repo
 [src](src):
-- [model.py](src\models.py) - Contains custom model classes.
-- [ml_helpers.py](src\ml_helpers.py) - Various train, test and prediction helper functions.
-- [plotting_helpers.py](src\plotting_helpers.py) - Functions for visualizing initial dataset and model results.
-- [data_helpers.py](src\data_helpers.py) - Functions for data scanning and processing.
-- [metrics_funcs.py](src\metrics_funcs.py) - Main metric functions used for assessing the model implemented by hand.
+- [model.py](src/models.py) - Contains custom model classes.
+- [ml_helpers.py](src/ml_helpers.py) - Various train, test and prediction helper functions.
+- [plotting_helpers.py](src/plotting_helpers.py) - Functions for visualizing initial dataset and model results.
+- [data_helpers.py](src/data_helpers.py) - Functions for data scanning and processing.
+- [metrics_funcs.py](src/metrics_funcs.py) - Main metric functions used for assessing the model implemented by hand.
 
 [tests](tests) - Contains scripts for testing implemented models and helper functions:
 
@@ -23,7 +23,7 @@ Model is tested on dummy data.
 
 | Linear Regression Model - No Predictions                   | Linear Regression Model - Predictions                   |
 |------------------------------------------------------------|---------------------------------------------------------|
-| ![](\tests\simple_lin_reg_model\lin_reg_model_no_pred.png) | ![](\tests\simple_lin_reg_model\lin_reg_model_pred.png) |
+| ![](tests/simple_lin_reg_model/lin_reg_model_no_pred.png) | ![](tests/simple_lin_reg_model/lin_reg_model_pred.png) |
 
 - testing code: [simple_lin_reg_model](tests/simple_lin_reg_model)
 
@@ -90,7 +90,7 @@ model should be trained on larger dataset and fine-tuned.
 
 | Original image                                | Model prediction                                           |
 |-----------------------------------------------|------------------------------------------------------------|
-| ![](tests/food_classification/pizza_img.jpeg) | ![](tests/food_classification/example_custom_prediction.png) |
+|<img src="tests/food_classification/data/pizza_img.jpeg" width="300" /> | ![](tests/food_classification/example_custom_prediction.png) |
 
 - testing code: [food_classification](tests/food_classification)
 
